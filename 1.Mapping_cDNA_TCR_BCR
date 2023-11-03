@@ -1,0 +1,60 @@
+###---------------------------------------------------------------1. mRNA mapping human-------------------------------------------------------------------------###
+####-------human cDNA mapping--------###
+#BSUB -J HeS
+#BSUB -n THREAD
+#BSUB -o %J.our
+#BSUB -e %J.err
+#BSUB -R span[hosts=1]
+##BSUB -q smp
+#######BSUB -m s001
+
+cellranger7.1.0 count \
+--force-cells=35000 \
+--id=SAMPLENAME  \
+--localcores=THREAD \
+--transcriptome=/data/home/heshuai/reference_data/refdata-cellranger7.1.0-GRCh38_19Y_EBV_5p \
+--fastqs=ABSPATH \
+--sample=SAMPLENAME
+###----------------------------------------------------------------------------------------------------------------------------------------------------------------###
+
+for i in $(ls /data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/1.Rawdata/cDNA|grep fastq.gz|grep -E R2|cut -d '_' -f1|sort -u|grep -E "LY66-C|LY67-C|LY68-C|LY69-C|LY70-C")
+do
+ABSPATH="/data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/1.Rawdata/cDNA"
+THREAD=15
+SAMPLENAME=$(echo $i)
+sed "s#ABSPATH#$ABSPATH#g;s#SAMPLENAME#$SAMPLENAME#g;s#THREAD#$THREAD#g" /data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/Script/1.Mappping.human_cDNA_HG38_Y19_Akata.lsf|bsub
+done
+
+####---------------------------------------------------------------2. human VDJ mapping-------------------------------------------------------------------------###
+#BSUB -J HeS
+#BSUB -n THREAD
+#BSUB -o %J.our
+#BSUB -e %J.err
+#BSUB -R span[hosts=1]
+##BSUB -q smp
+#######BSUB -m s001
+
+cellranger7.1.0 vdj \
+--id=SAMPLENAME \
+--localcores=THREAD  \
+--reference=/data/home/heshuai/reference_data/refdata-cellranger-vdj-GRCh38-alts-ensembl-7.1.0 \
+--fastqs=ABSPATH \
+--sample=SAMPLENAME
+
+###----------------------------------------------------------------------------------------------------------------------------------------------------------------###
+for i in $(ls /data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/1.Rawdata/VDJ|grep fastq.gz|grep -E R2|cut -d '_' -f1|sort -u|grep -E "LY66-B|LY67-B|LY68-B|LY69-B|LY70-B|LY66-T|LY67-T|LY68-T|LY69-T|LY70-T")
+do
+ABSPATH="/data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/1.Rawdata/VDJ"
+THREAD=8
+SAMPLENAME=$(echo $i)
+sed "s#ABSPATH#$ABSPATH#g;s#SAMPLENAME#$SAMPLENAME#g;s#THREAD#$THREAD#g" /data4/heshuai/RAW_data/1-SingleCell/27.EBV_GC/Script/2.Mappping.human_VDJ_7.1.0_HG38_Y19_Akata_.lsf|bsub
+done
+
+
+
+
+
+
+
+
+
